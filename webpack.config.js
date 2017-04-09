@@ -1,5 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
+
 
 const PATHS = {
   app: path.join(__dirname, 'app'), 
@@ -20,6 +22,22 @@ const commonConfig = {
     new HtmlWebpackPlugin({
       title: 'Webpack demo',
     }),
+    new webpack.LoaderOptionsPlugin({
+        options: {
+          eslint: {
+            //fail only on errors
+            failOnWarning: false,
+            failOnError: true,
+            //toggle auto fix
+            fix: false,
+            //output to jenkins compatible XML
+            outputReport: {
+              filePath: 'checkstyle.xml',
+              formatter: require('eslint/lib/formatters/checkstyle'), 
+            },
+          },
+        },
+    }),
   ], 
 };
 
@@ -35,6 +53,23 @@ const developmentConfig = () => {
       stats: 'errors-only',
       host: process.env.HOST, // Defaults to `localhost`
       port: process.env.PORT, // Defaults to 8080
+      // overlay: true captures only errors
+      overlay: {
+        errors: true,
+        warnings: true,
+      },
+    },
+    module: {
+      rules: [
+        {
+          test: /\.js$/,
+          enforce: 'pre',
+          loader: 'eslint-loader',
+          options: {
+            emitWarning: true,
+          },
+        }, 
+      ],
     },
   };
   return Object.assign(
