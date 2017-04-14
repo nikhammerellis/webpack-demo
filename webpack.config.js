@@ -1,6 +1,9 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
+const merge = require('webpack-merge');
+
+const parts = require('./webpack.parts');
 
 
 const PATHS = {
@@ -8,21 +11,22 @@ const PATHS = {
   build: path.join(__dirname, 'build'),
 };
 
-const commonConfig = {
-  entry: 
+const commonConfig = merge([
   {
-    app: PATHS.app,
-  }, 
-  output: 
-  {
-    path: PATHS.build,
-    filename: '[name].js',
-  },
-  plugins: [
-    new HtmlWebpackPlugin({
-      title: 'Webpack demo',
-    }),
-    new webpack.LoaderOptionsPlugin({
+    entry: 
+    {
+      app: PATHS.app,
+    }, 
+    output: 
+    {
+      path: PATHS.build,
+      filename: '[name].js',
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+        title: 'Webpack demo',
+      }),
+      new webpack.LoaderOptionsPlugin({
         options: {
           eslint: {
             //fail only on errors
@@ -37,54 +41,27 @@ const commonConfig = {
             },
           },
         },
-    }),
-  ], 
-};
+      }),
+    ], 
+  },
+  parts.lintJavaScript({ include: PATHS.app }),
+]);
 
-const productionConfig = () => commonConfig;
+const productionConfig = merge([
+]);
 
-const developmentConfig = () => {
-  const config = {
-    devServer: {
-			// Enable history API fallback so HTML5 History API based
-      // routing works. Good for complex setups.
-      historyApiFallback: true,
-      // Display only errors to reduce the amount of output.
-      stats: 'errors-only',
-      host: process.env.HOST, // Defaults to `localhost`
-      port: process.env.PORT, // Defaults to 8080
-      // overlay: true captures only errors
-      overlay: {
-        errors: true,
-        warnings: true,
-      },
-    },
-    module: {
-      rules: [
-        {
-          test: /\.js$/,
-          enforce: 'pre',
-          loader: 'eslint-loader',
-          options: {
-            emitWarning: true,
-          },
-        }, 
-      ],
-    },
-  };
-  return Object.assign(
-    {},
-    commonConfig,
-		config 
-	);
-};
-
-
-
+const developmentConfig = merge([
+  parts.devServer({
+    // Customize host/port here if needed
+    host: process.env.HOST,
+    port: process.env.PORT,
+  }),
+]);   
+  
 module.exports = (env) => {
   if (env === 'production') {
-    return productionConfig();
+    return merge(commonConfig, productionConfig);
   }
 
-  return developmentConfig();
+  return merge(commonConfig, developmentConfig);
 };
