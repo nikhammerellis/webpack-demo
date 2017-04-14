@@ -41,8 +41,8 @@ exports.loadCSS = ({ include, exclude } = {}) => ({
             loader: 'css-loader',
             options: {
               modules: true,
-            }
-          }
+            },
+          },
         ],
       },
     ],
