@@ -1,4 +1,5 @@
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const PurifyCSSPlugin = require('purifycss-webpack');
 
 exports.devServer = ({ host, port } = {}) => ({
   devServer: {
@@ -78,5 +79,33 @@ exports.autoprefix = () => ({
     plugins: () => ([
       require('autoprefixer'),
     ]),
+  },
+});
+
+exports.purifyCSS = ({ paths }) => ({
+  plugins: [
+    new PurifyCSSPlugin({ paths }),
+  ],
+});
+
+exports.lintCSS = ({ include, exclude }) => ({
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        include,
+        exclude,
+        enforce: 'pre',
+        loader: 'postcss-loader',
+        options: {
+          plugins: () => ([
+            require('stylelint')({
+              //ignore node_modules CSS 
+              ignoreFiles: 'node_modules/**/*.css',
+            }),
+          ]),
+        },
+      },
+    ],
   },
 });
