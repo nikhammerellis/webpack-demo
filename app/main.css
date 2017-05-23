@@ -1,4 +1,7 @@
 body {
 	background: #7fffd4;
 	display: flex;
+	background-image: url('./logo.jpg'); 
+	background-repeat: no-repeat; 
+	background-position: center;
 }

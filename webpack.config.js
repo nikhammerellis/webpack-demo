@@ -47,6 +47,11 @@ const commonConfig = merge([
   },
   parts.lintJavaScript({ include: PATHS.app }),
   parts.lintCSS({ include: PATHS.app }),
+  parts.loadFonts({
+    options: {
+      name: '[name].[ext]',
+    },
+  }),
 ]);
 
 const productionConfig = merge([
@@ -57,6 +62,12 @@ const productionConfig = merge([
   parts.purifyCSS({
     paths: glob.sync('${PATHS.app}/**/*', { nodir: true }),
   }),
+  parts.loadImages({
+    options: {
+      limit: 15000,
+      name: '[name].[ext]',
+    }
+  })
 ]);
 
 const developmentConfig = merge([
@@ -66,6 +77,7 @@ const developmentConfig = merge([
     port: process.env.PORT,
   }),
   parts.loadCSS(),
+  parts.loadImages(),
 ]);   
   
 module.exports = (env) => {
